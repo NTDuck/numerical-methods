@@ -1,50 +1,53 @@
+use matrix::Matrix;
+
+pub mod matrix;
+
 pub type Number = f64;
-pub type Matrix<const N: usize> = [[Number; N]; N];
 pub type ColumnVector<const N: usize> = [Number; N];
 
 pub fn factor<const N: usize>(a: Matrix<N>) -> (Matrix<N>, Matrix<N>) {
-    let mut l = [[0.0; N]; N];
-    let mut u = [[0.0; N]; N];
+    let mut l: Matrix<N> = Matrix::default();
+    let mut u: Matrix<N> = Matrix::default();
 
     // Step 1
-    l[0][0] = 1.0;
-    u[0][0] = a[0][0] / l[0][0]; // May panic
+    l.set((1, 1), 1.0);
+    u.set((1, 1), a.get((1, 1)) / l.get((1, 1)));
 
     // Step 2
-    for j in 1..N {
-        u[0][j] = a[0][j] / l[0][0]; // First row of U
-        l[j][0] = a[j][0] / u[0][0]; // First column of L
+    for j in 2..N + 1 {
+        u.set((1, j), a.get((1, j)) / l.get((1, 1))); // First row of U
+        l.set((j, 1), a.get((j, 1)) / u.get((1, 1))); // First column of L
     }
 
     // Step 3
-    for i in 1..N - 1 {
+    for i in 2..N {
         // Step 4
-        l[i][i] = 1.0;
-        let sum: Number = (0..i)
-            .map(|k| l[i][k] * u[k][i])
+        l.set((i, i), 1.0);
+        let sum: Number = (1..i)
+            .map(|k| l.get((i, k)) * u.get((k, i)))
             .sum();
-        u[i][i] = (a[i][i] - sum) / l[i][i]; // May panic
+        u.set((i, i), (a.get((i, i)) - sum) / l.get((i, i))); // May panic
 
         // Step 5
-        for j in i + 1..N {
-            let sum_u: Number = (0..i)
-                .map(|k| l[i][k] * u[k][j])
+        for j in i + 1..N + 1 {
+            let sum: Number = (1..i)
+                .map(|k| l.get((i, k)) * u.get((k, j)))
                 .sum();
-            u[i][j] = (a[i][j] - sum_u) / l[i][i]; // i-th row of U
+            u.set((i, j), (a.get((i, j)) - sum) / l.get((i, i))); // i-th row of U
 
-            let sum_l: Number = (0..i)
-                .map(|k| l[j][k] * u[k][i])
+            let sum: Number = (1..i)
+                .map(|k| l.get((j, k)) * u.get((k, i)))
                 .sum();
-            l[j][i] = (a[j][i] - sum_l) / u[i][i]; // i-th column of L
+            l.set((j, i), (a.get((j, i)) - sum) / u.get((i, i))); // i-th column of L
         }
     }
 
     // Step 6
-    l[N - 1][N - 1] = 1.0;
-    let sum: Number = (0..N - 1)
-        .map(|k| l[N - 1][k] * u[k][N - 1])
+    l.set((N, N), 1.0);
+    let sum: Number = (1..N)
+        .map(|k| l.get((N, k)) * u.get((k, N)))
         .sum();
-    u[N - 1][N - 1] = (a[N - 1][N - 1] - sum) / l[N - 1][N - 1]; // May not panic
+    u.set((N, N), (a.get((N, N)) - sum) / l.get((N, N))); // May not panic
 
     // Step 7
     (l, u)
