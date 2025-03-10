@@ -26,12 +26,6 @@ impl<const N: usize> Default for Matrix<N> {
     }
 }
 
-impl<const N: usize> PartialEq for Matrix<N> {
-    fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
-    }
-}
-
 impl<const N: usize> Display for Matrix<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let max_width = self.0.iter()

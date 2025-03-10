@@ -1,11 +1,18 @@
+use column_vector::ColumnVector;
 use matrix::Matrix;
 
+pub mod column_vector;
 pub mod matrix;
 
 pub type Number = f64;
-pub type ColumnVector<const N: usize> = [Number; N];
 
-pub fn factor<const N: usize>(a: Matrix<N>) -> (Matrix<N>, Matrix<N>) {
+pub fn solve<const N: usize>(a: Matrix<N>, b: ColumnVector<N>) -> ColumnVector<N> {
+    let (l, u) = decompose(a);
+    let y = forward_substitution(l, b);
+    backward_substitution(u, y)
+}
+
+fn decompose<const N: usize>(a: Matrix<N>) -> (Matrix<N>, Matrix<N>) {
     let mut l: Matrix<N> = Matrix::default();
     let mut u: Matrix<N> = Matrix::default();
 
@@ -53,10 +60,28 @@ pub fn factor<const N: usize>(a: Matrix<N>) -> (Matrix<N>, Matrix<N>) {
     (l, u)
 }
 
-// pub fn forward_substitution<const N: usize>(l: Matrix<N>, b: ColumnVector<N>) -> ColumnVector<N> {
-//     todo!()
-// }
+fn forward_substitution<const N: usize>(l: Matrix<N>, b: ColumnVector<N>) -> ColumnVector<N> {
+    let mut y: ColumnVector<N> = ColumnVector::default();
 
-// pub fn backward_substitution<const N: usize>(u: Matrix<N>, y: ColumnVector<N>) -> ColumnVector<N> {
-//     todo!()
-// }
+    for i in 1..N + 1 {
+        let sum: Number = (1..i + 1)
+            .map(|j| l.get((i, j)) * y.get(j))
+            .sum();
+        y.set(i, (b.get(i) - sum) / l.get((i, i)));
+    }
+
+    y
+}
+
+fn backward_substitution<const N: usize>(u: Matrix<N>, y: ColumnVector<N>) -> ColumnVector<N> {
+    let mut x: ColumnVector<N> = ColumnVector::default();
+
+    for i in (1..N + 1).rev() {
+        let sum: Number = (i + 1..N + 1)
+            .map(|j| u.get((i, j)) * x.get(j))
+            .sum();
+        x.set(i, (y.get(i) - sum) / u.get((i, i)));
+    }
+
+    x
+}
