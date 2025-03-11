@@ -1,7 +1,10 @@
 [package]
-name = "gaussian-elimination"
+name = "system-of-equations"
 version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
 nalgebra = "0.33"
+
+[dev-dependencies]
+approx = "0.5"
