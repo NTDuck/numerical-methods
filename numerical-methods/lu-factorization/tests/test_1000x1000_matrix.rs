@@ -3,7 +3,7 @@ use rand::Rng;
 
 #[test]
 fn test() {
-    const N: usize = 161; // Current limit
+    const N: usize = 161; // Stack overflow at 162+
     let a: Matrix<N> = random_matrix();
     let b: ColumnVector<N> = random_column_vector();
     let x = solve(a, b);
