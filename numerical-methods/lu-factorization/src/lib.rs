@@ -1,8 +1,8 @@
-use column_vector::ColumnVector;
-use matrix::Matrix;
+pub use column_vector::ColumnVector;
+pub use matrix::Matrix;
 
-pub mod column_vector;
-pub mod matrix;
+mod column_vector;
+mod matrix;
 
 pub type Number = f64;
 

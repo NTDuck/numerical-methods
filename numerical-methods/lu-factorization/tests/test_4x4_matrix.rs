@@ -1,4 +1,4 @@
-use lu_factorization::{column_vector::ColumnVector, matrix::Matrix, solve};
+use lu_factorization::{ColumnVector, Matrix, solve};
 
 #[test]
 fn test_factor() {
