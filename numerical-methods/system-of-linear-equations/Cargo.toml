@@ -1,5 +1,5 @@
 [package]
-name = "system-of-equations"
+name = "system-of-linear-equations"
 version = "0.1.0"
 edition.workspace = true
 
