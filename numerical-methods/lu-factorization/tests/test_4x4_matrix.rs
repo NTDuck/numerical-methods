@@ -1,7 +1,7 @@
 use lu_factorization::{ColumnVector, Matrix, solve};
 
 #[test]
-fn test_factor() {
+fn test() {
     let a = Matrix::from([
         [1.0, -1.0, 0.0, 3.0],
         [2.0, 1.0, -1.0, 1.0],
@@ -16,5 +16,5 @@ fn test_factor() {
     ]);
     let x = solve(a, b);
 
-    dbg!(x);
+    println!("{}", x);
 }
