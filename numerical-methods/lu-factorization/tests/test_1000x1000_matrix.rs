@@ -1,4 +1,4 @@
-use lu_factorization::{solve, ColumnVector, Matrix};
+use lu_factorization::{solve, ColumnVector, Matrix, Number};
 use rand::Rng;
 
 #[test]
@@ -19,7 +19,7 @@ fn random_matrix<const N: usize>() -> Matrix<N> {
         for j in 0..N {
             let mut value = 0.0;
             while value == 0.0 {
-                value = rng.random_range(-10.0..10.0)
+                value = rng.random_range(Number::MIN / 2.0..Number::MAX / 2.0)
             }
             matrix[i][j] = value;
         }
@@ -35,7 +35,7 @@ fn random_column_vector<const N: usize>() -> ColumnVector<N> {
     for i in 0..N {
         let mut value = 0.0;
         while value == 0.0 {
-            value = rng.random_range(-10.0..10.0)
+            value = rng.random_range(Number::MIN / 2.0..Number::MAX / 2.0)
         }
         column_vector[i] = value;
     }
