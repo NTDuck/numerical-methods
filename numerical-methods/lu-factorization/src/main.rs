@@ -15,8 +15,7 @@ fn main() {
         4.0,
     ]);
 
-    let x = lu::solve(&a, &b);
-    let x = x.normalize();
+    let x = lu_factorization::solve(&a, &b).normalize();
 
     println!("{}", x);
     assert_eq!(x, DVector::<f64>::from_vec(vec![
