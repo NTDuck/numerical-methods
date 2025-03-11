@@ -1,10 +1,14 @@
-pub use column_vector::ColumnVector;
 pub use matrix::Matrix;
+pub use column_vector::ColumnVector;
+pub use row_vector::RowVector;
+pub use vector::Vector;
+pub use number::Number;
 
-mod column_vector;
 mod matrix;
-
-pub type Number = f64;
+mod column_vector;
+mod row_vector;
+mod vector;
+mod number;
 
 pub fn solve<const N: usize>(a: Matrix<N>, b: ColumnVector<N>) -> ColumnVector<N> {
     let (l, u) = decompose(a);
