@@ -1,5 +1,5 @@
 macro_rules! test {
-    ($solver:ident, $N:expr, [$($a:tt)*], [$($b:tt)*]) => {
+    (id = $id:expr, algo = $solver:ident, N = $N:expr, a = [$($a:tt)*], b = [$($b:tt)*]) => {
         paste::paste! {
             #[test]
             fn [<test_$solver _$N x$N>]() {
