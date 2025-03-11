@@ -1,10 +1,8 @@
 macro_rules! test {
-    ($solver:path, $N:expr, [$($a:tt)*], [$($b:tt)*]) => {
-        use paste::paste;
-
-        paste! {
+    ($solver:ident, $N:expr, [$($a:tt)*], [$($b:tt)*]) => {
+        paste::paste! {
             #[test]
-            fn [<test_$N x$N>]() {
+            fn [<test_$solver _$N x$N>]() {
                 use approx::relative_eq;
                 use nalgebra::{SMatrix, SVector};
                 use system_of_linear_equations::Num;
