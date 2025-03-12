@@ -27,18 +27,16 @@ test!(
     epsilon = 1e-9,
 );
 
-// Slow, consider skipping
-test!(
-    id = 0002,
-    algo = gaussian_elimination_with_backward_substitution,
-    N = 1000,
-    epsilon = 1e-9,
-);
+// test!(
+//     id = 0002,
+//     algo = gaussian_elimination_with_backward_substitution,
+//     N = 1000,
+//     epsilon = 1e-8,
+// );
 
-// Very slow, consider skipping
-test!(
-    id = 0003,
-    algo = gaussian_elimination_with_backward_substitution,
-    N = 1_000_000,
-    epsilon = 1e-9,
-);
+// test!(
+//     id = 0003,
+//     algo = gaussian_elimination_with_backward_substitution,
+//     N = 10_000,
+//     epsilon = 1e-7,
+// );

@@ -3,6 +3,7 @@ use nalgebra::{DMatrix, DVector};
 use crate::Num;
 
 // R. L. Burden & J. D. Faires, CH06_1A Linear Systems of Equations.pdf (p. 40-43)
+// https://www.math.hkust.edu.hk/~mamu/courses/231/Slides/CH06_1A.pdf
 pub fn solve(a: &DMatrix<Num>, b: &DVector<Num>) -> Option<DVector<Num>> {
     if !a.is_square() {
         return None;
@@ -21,7 +22,7 @@ pub fn solve(a: &DMatrix<Num>, b: &DVector<Num>) -> Option<DVector<Num>> {
             p += 1;
         }
         if p == n {
-            return None; // No unique solution
+            return None;
         }
         
         // Step 3: Swap rows if needed
@@ -40,15 +41,17 @@ pub fn solve(a: &DMatrix<Num>, b: &DVector<Num>) -> Option<DVector<Num>> {
         }
     }
     
-    // Step 7: Check if system has a unique solution
+    // Step 7
     if a[(n - 1, n - 1)] == 0.0 {
         return None;
     }
     
-    // Step 8-10: Back-substitution
+    // Step 8-10: Backward substitution
     let mut x = DVector::<Num>::zeros(n);
     for i in (0..n).rev() {
-        let sum = (i + 1..n).map(|j| a[(i, j)] * x[j]).sum::<Num>();
+        let sum = (i + 1..n)
+            .map(|j| a[(i, j)] * x[j])
+            .sum::<Num>();
         x[i] = (b[i] - sum) / a[(i, i)];
     }
     

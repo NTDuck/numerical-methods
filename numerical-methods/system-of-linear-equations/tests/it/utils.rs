@@ -58,7 +58,7 @@ macro_rules! test {
                         if !relative_eq!(actual_x, expected_x, epsilon = $epsilon) {
                             panic!(
                                 "Solutions differ beyond precision tolerance ({:?}).\nExpected: {:?}\nFound: {:?}",
-                                expected_x.as_slice(), actual_x.as_slice(), $epsilon,
+                                $epsilon, expected_x.as_slice(), actual_x.as_slice(),
                             );
                         }
                     },
