@@ -1,17 +1,26 @@
-use nalgebra::{SMatrix, SVector};
+use nalgebra::{DMatrix, DVector};
 
 use crate::Num;
 
 // R. L. Burden & J. D. Faires, CH06_1A Linear Systems of Equations.pdf (p. 40-43)
-pub fn solve<const N: usize>(mut a: SMatrix<Num, N, N>, mut b: SVector<Num, N>) -> Option<SVector<Num, N>> {
+pub fn solve(a: &DMatrix<Num>, b: &DVector<Num>) -> Option<DVector<Num>> {
+    if !a.is_square() {
+        return None;
+    }
+
+    let n = a.nrows();
+
+    let mut a= a.clone_owned();
+    let mut b = b.clone_owned();
+
     // Step 1: Forward elimination
-    for i in 0..N {
+    for i in 0..n {
         // Step 2: Find pivot row
         let mut p = i;
-        while p < N && a[(p, i)] == 0.0 {
+        while p < n && a[(p, i)] == 0.0 {
             p += 1;
         }
-        if p == N {
+        if p == n {
             return None; // No unique solution
         }
         
@@ -22,9 +31,9 @@ pub fn solve<const N: usize>(mut a: SMatrix<Num, N, N>, mut b: SVector<Num, N>) 
         }
         
         // Step 4: Eliminate column below pivot
-        for j in i+1..N {
+        for j in i + 1..n {
             let m_ji = a[(j, i)] / a[(i, i)];
-            for k in i..N {
+            for k in i..n {
                 a[(j, k)] -= m_ji * a[(i, k)];
             }
             b[j] -= m_ji * b[i];
@@ -32,14 +41,14 @@ pub fn solve<const N: usize>(mut a: SMatrix<Num, N, N>, mut b: SVector<Num, N>) 
     }
     
     // Step 7: Check if system has a unique solution
-    if a[(N-1, N-1)] == 0.0 {
+    if a[(n - 1, n - 1)] == 0.0 {
         return None;
     }
     
     // Step 8-10: Back-substitution
-    let mut x = SVector::<Num, N>::zeros();
-    for i in (0..N).rev() {
-        let sum = (i+1..N).map(|j| a[(i, j)] * x[j]).sum::<Num>();
+    let mut x = DVector::<Num>::zeros(n);
+    for i in (0..n).rev() {
+        let sum = (i + 1..n).map(|j| a[(i, j)] * x[j]).sum::<Num>();
         x[i] = (b[i] - sum) / a[(i, i)];
     }
     
