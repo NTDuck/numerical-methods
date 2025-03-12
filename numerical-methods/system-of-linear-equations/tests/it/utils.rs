@@ -1,5 +1,5 @@
 macro_rules! test {
-    (id = $id:expr, algo = $solver:ident, N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*]) => {
+    (id = $id:expr, algo = $solver:ident, N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*], epsilon = $epsilon:expr) => {
         paste::paste! {
             #[test]
             fn [<test_$solver _$N x$N>]() {
@@ -8,7 +8,7 @@ macro_rules! test {
                 use system_of_linear_equations::Num;
 
                 // Transpose because SMatrix::from_vec fills column-by-column
-                let a = SMatrix::<Num, $N, $N>::from_vec(vec![$($a)*]).transpose();
+                let a = SMatrix::<Num, $N, $N>::from_vec(vec![$($a)*]);
                 let b = SVector::<Num, $N>::from_vec(vec![$($b)*]);
 
                 let actual_x = $solver(a, b);
@@ -17,7 +17,7 @@ macro_rules! test {
                 match (actual_x, expected_x) {
                     (None, None) => {},
                     (Some(actual_x), Some(expected_x)) => {
-                        assert!(relative_eq!(actual_x, expected_x, epsilon = Num::EPSILON),
+                        assert!(relative_eq!(actual_x, expected_x, epsilon = $epsilon),
                             "Solutions differ beyond precision tolerance");
                     },
                     (None, Some(_)) => panic!("Expected a unique solution, found no solution"),
@@ -25,6 +25,14 @@ macro_rules! test {
                 }
             }
         }
+    };
+
+    (id = $id:expr, algo = $solver:ident, N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*], epsilon = $epsilon:expr,) => {
+        test!(id = $id, algo = $solver, N = $N, A = [$($a)*], b = [$($b)*], epsilon = $epsilon);
+    };
+
+    (id = $id:expr, algo = $solver:ident, N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*]) => {
+        test!(id = $id, algo = $solver, N = $N, A = [$($a)*], b = [$($b)*], epsilon = Num::EPSILON);
     };
 
     (id = $id:expr, algo = $solver:ident, N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*],) => {
