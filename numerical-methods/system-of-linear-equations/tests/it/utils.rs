@@ -56,11 +56,9 @@ macro_rules! test {
                     (None, None) => {},
                     (Some(actual_x), Some(expected_x)) => {
                         if !relative_eq!(actual_x, expected_x, epsilon = $epsilon) {
-                            print_differences(actual_x, expected_x, $epsilon);
-
                             panic!(
-                                "Solutions differ beyond precision tolerance ({:?})",
-                                $epsilon,
+                                "Solutions differ beyond precision tolerance ({:?}).\nExpected: {:?}\nFound: {:?}",
+                                expected_x.as_slice(), actual_x.as_slice(), $epsilon,
                             );
                         }
                     },
@@ -72,63 +70,6 @@ macro_rules! test {
                         "Expected no solution, found a unique solution.\nFound: {:?}",
                         actual_x,
                     ),
-                }
-
-                fn print_differences(actual: DVector<Num>, expected: DVector<Num>, epsilon: Num) {
-                    use colored::*;
-                    use colored::control::set_override;
-                    use tabled::{Table, Tabled, settings::object::Rows, settings::{Style, Alignment}};
-                
-                    set_override(true);
-                
-                    #[derive(Tabled)]
-                    struct Row {
-                        #[tabled(rename = "#")]
-                        index: usize,
-                
-                        #[tabled(rename = "Actual")]
-                        actual: String,
-                
-                        #[tabled(rename = "Expected")]
-                        expected: String,
-                
-                        #[tabled(rename = "Diff (a - e)")]
-                        diff: String,
-                
-                        #[tabled(rename = "ULPs (a / e)")]
-                        ulps: String,
-                    }
-                
-                    let rows: Vec<Row> = actual
-                        .iter()
-                        .zip(expected.iter())
-                        .enumerate()
-                        .map(|(i, (&a, &e))| {
-                            let color = if (a - e).abs() > epsilon { "Red" } else { "Green" };
-                            Row {
-                                index: i,
-                                actual: format!("{}", a).color(color).to_string(),
-                                expected: format!("{}", e).color(color).to_string(),
-                                diff: format!("{}", (a - e)).color(color).to_string(),
-                                ulps: format!("{}", (a / e)).color(color).to_string(),
-                            }
-                        })
-                        .collect();
-                
-                    let table = Table::new(rows)
-                        .with(Style::rounded())
-                        .modify(Rows::new(1..), Alignment::center())
-                        .with(Style::empty()) // Remove all default borders
-                        .to_string();
-                
-                    // Manually add separator only after the header
-                    if let Some(pos) = table.find('\n') {
-                        let (header, body) = table.split_at(pos + 1);
-                        let separator = "-".repeat(header.len());
-                        println!("{header}{separator}\n{body}");
-                    } else {
-                        println!("{table}");
-                    }
                 }
             }
         }
