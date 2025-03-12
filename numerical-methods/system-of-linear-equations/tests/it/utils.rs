@@ -47,7 +47,7 @@ macro_rules! test {
 
     // Specify id, algo, N, epsilon, omit A, b
     (id = $id:expr, algo = $solver:ident, N = $N:expr, epsilon = $epsilon:expr) => {
-        test!(id = $id, algo = $solver, N = $N, A = crate::utils::__random_vec::<{ $N * $N }>(), b = crate::utils::__random_vec::<$N>(), epsilon = $epsilon);
+        test!(id = $id, algo = $solver, N = $N, A = crate::utils::__random_vec::<{ $N * $N }>(crate::utils::__LOWER_BOUND..crate::utils::__UPPER_BOUND), b = crate::utils::__random_vec::<$N>(crate::utils::__LOWER_BOUND..crate::utils::__UPPER_BOUND), epsilon = $epsilon);
     };
 
     (id = $id:expr, algo = $solver:ident, N = $N:expr, epsilon = $epsilon:expr,) => {
@@ -56,7 +56,7 @@ macro_rules! test {
 
     // Specify id, algo, N, omit A, b, epsilon
     (id = $id:expr, algo = $solver:ident, N = $N:expr) => {
-        test!(id = $id, algo = $solver, N = $N, A = crate::utils::__random_vec::<{ $N * $N }>(), b = crate::utils::__random_vec::<$N>(), epsilon = crate::utils::__EPISILON);
+        test!(id = $id, algo = $solver, N = $N, A = crate::utils::__random_vec::<{ $N * $N }>(crate::utils::__LOWER_BOUND..crate::utils::__UPPER_BOUND), b = crate::utils::__random_vec::<$N>(crate::utils::__LOWER_BOUND..crate::utils::__UPPER_BOUND), epsilon = crate::utils::__EPISILON);
     };
 
     (id = $id:expr, algo = $solver:ident, N = $N:expr,) => {
@@ -99,15 +99,6 @@ macro_rules! test {
             }
         }
     };
-
-    // (
-    //     id = $id:expr,
-    //     algos = [$($solver:ident),+],
-    //     N = $N:expr,
-    //     A = $A:expr,
-    //     b = $b:expr,
-    //     epsilon = $epsilon:expr
-    // )
 }
 
 pub(crate) use test;
@@ -115,41 +106,6 @@ pub(crate) use test;
 pub const __EPISILON: Num = Num::EPSILON;
 pub const __LOWER_BOUND: Num = -1e100;
 pub const __UPPER_BOUND: Num = 1e100;
-
-// pub fn __test<const N: usize>(
-//     solve_fn: impl Fn(&DMatrix<Num>, &DVector<Num>) -> Option<DVector<Num>>,
-//     a: Vec<Num>,
-//     b: Vec<Num>,
-//     epsilon: Num,
-//     lower_bound: Num,
-//     upper_bound: Num,
-// ) {
-//     let a = DMatrix::<Num>::from_vec(N, N, a);
-//     let b = DVector::<Num>::from_vec(b);
-
-//     let actual_x = solve_fn(&a, &b);
-//     let expected_x = a.svd(true, true).solve(&b, epsilon).ok(); // Most numerically stable method
-
-//     match (actual_x, expected_x) {
-//         (None, None) => {},
-//         (Some(actual_x), Some(expected_x)) => {
-//             if !relative_eq!(actual_x, expected_x, epsilon = $epsilon) {
-//                 panic!(
-//                     "Solutions differ beyond precision tolerance ({:?}).\nExpected: {:?}\nFound: {:?}",
-//                     $epsilon, expected_x.as_slice(), actual_x.as_slice(),
-//                 );
-//             }
-//         },
-//         (None, Some(expected_x)) => panic!(
-//             "Expected a unique solution, found no solution.\nExpected: {:?}",
-//             expected_x,
-//         ),
-//         (Some(actual_x), None) => panic!(
-//             "Expected no solution, found a unique solution.\nFound: {:?}",
-//             actual_x,
-//         ),
-//     }
-// }
 
 pub fn __random_vec<const N: usize>(bounds: Range<Num>) -> Vec<Num> {
     use rand::Rng;
