@@ -19,3 +19,17 @@ test!(
         4.0,
     ],
 );
+
+test!(
+    id = 0001,
+    algo = gaussian_elimination_with_backward_substitution,
+    N = 100,
+    epsilon = 1e-9,
+);
+
+test!(
+    id = 0002,
+    algo = gaussian_elimination_with_backward_substitution,
+    N = 127,
+    epsilon = 1e-9,
+);

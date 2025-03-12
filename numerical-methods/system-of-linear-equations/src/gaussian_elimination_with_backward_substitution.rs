@@ -1,7 +1,9 @@
 use nalgebra::{SMatrix, SVector};
 
+use crate::Num;
+
 // R. L. Burden & J. D. Faires, CH06_1A Linear Systems of Equations.pdf (p. 40-43)
-pub fn solve<const N: usize>(mut a: SMatrix<f64, N, N>, mut b: SVector<f64, N>) -> Option<SVector<f64, N>> {
+pub fn solve<const N: usize>(mut a: SMatrix<Num, N, N>, mut b: SVector<Num, N>) -> Option<SVector<Num, N>> {
     // Step 1: Forward elimination
     for i in 0..N {
         // Step 2: Find pivot row
@@ -35,9 +37,9 @@ pub fn solve<const N: usize>(mut a: SMatrix<f64, N, N>, mut b: SVector<f64, N>) 
     }
     
     // Step 8-10: Back-substitution
-    let mut x = SVector::<f64, N>::zeros();
+    let mut x = SVector::<Num, N>::zeros();
     for i in (0..N).rev() {
-        let sum = (i+1..N).map(|j| a[(i, j)] * x[j]).sum::<f64>();
+        let sum = (i+1..N).map(|j| a[(i, j)] * x[j]).sum::<Num>();
         x[i] = (b[i] - sum) / a[(i, i)];
     }
     
