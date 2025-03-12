@@ -2,17 +2,21 @@ use system_of_linear_equations::Num;
 
 macro_rules! test {
     // Specify id, multiple algos, N, epsilon, omit A, b
-    (id = $id:expr, algos = [$($solver:ident,)+], N = $N:expr, epsilon = $epsilon:expr,) => {
+    (id = $id:expr, algos = [$($solver:ident,)+], N = $N:expr, epsilon = $epsilon:expr) => {
         test!(id = $id, algos = [$($solver,)+], N = $N, A = crate::utils::__random_vec::<{ $N * $N }>(), b = crate::utils::__random_vec::<$N>(), epsilon = $epsilon);
+    };
+
+    (id = $id:expr, algos = [$($solver:ident,)+], N = $N:expr, epsilon = $epsilon:expr,) => {
+        test!(id = $id, algos = [$($solver,)+], N = $N, epsilon = $epsilon);
     };
 
     // Specify id, multiple algos, N, A, b, epsilon
     (id = $id:expr, algos = [$($solver:ident,)+], N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*], epsilon = $epsilon:expr) => {
-        test!(id = $id, algos = [$($solver)+], N = $N, A = vec![$($a)*], b = vec![$($b)*], epsilon = $epsilon);
+        test!(id = $id, algos = [$($solver,)+], N = $N, A = vec![$($a)*], b = vec![$($b)*], epsilon = $epsilon);
     };
 
     (id = $id:expr, algos = [$($solver:ident,)+], N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*], epsilon = $epsilon:expr,) => {
-        test!(id = $id, algos = [$($solver)+], N = $N, A = [$($a)*], b = [$($b)*], epsilon = $epsilon);
+        test!(id = $id, algos = [$($solver,)+], N = $N, A = [$($a)*], b = [$($b)*], epsilon = $epsilon);
     };
 
     (id = $id:expr, algos = [$($solver:ident,)+], N = $N:expr, A = $A:expr, b = $b:expr, epsilon = $epsilon:expr) => {
