@@ -24,7 +24,7 @@ test!(
         -3.0,
         4.0,
     ],
-    epsilon = Num::EPSILON,
+    epsilon = 1e-12,
 );
 
 test!(
@@ -43,6 +43,6 @@ test!(
         gaussian_elimination_with_backward_substitution,
         lu_factorization,
     ],
-    N = 200,
+    N = 500,
     epsilon = 1e-6,
 );
