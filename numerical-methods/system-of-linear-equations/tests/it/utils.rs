@@ -1,7 +1,27 @@
 use system_of_linear_equations::Num;
 
 macro_rules! test {
-    // Specify A, b, epsilon
+    // Specify id, multiple algos, N, epsilon, omit A, b
+    (id = $id:expr, algos = [$($solver:ident,)+], N = $N:expr, epsilon = $epsilon:expr,) => {
+        test!(id = $id, algos = [$($solver,)+], N = $N, A = crate::utils::__random_vec::<{ $N * $N }>(), b = crate::utils::__random_vec::<$N>(), epsilon = $epsilon);
+    };
+
+    // Specify id, multiple algos, N, A, b, epsilon
+    (id = $id:expr, algos = [$($solver:ident,)+], N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*], epsilon = $epsilon:expr) => {
+        test!(id = $id, algos = [$($solver)+], N = $N, A = vec![$($a)*], b = vec![$($b)*], epsilon = $epsilon);
+    };
+
+    (id = $id:expr, algos = [$($solver:ident,)+], N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*], epsilon = $epsilon:expr,) => {
+        test!(id = $id, algos = [$($solver)+], N = $N, A = [$($a)*], b = [$($b)*], epsilon = $epsilon);
+    };
+
+    (id = $id:expr, algos = [$($solver:ident,)+], N = $N:expr, A = $A:expr, b = $b:expr, epsilon = $epsilon:expr) => {
+        $(
+            test!(id = $id, algo = $solver, N = $N, A = $A, b = $b, epsilon = $epsilon);
+        )+
+    };
+
+    // Specify id, algo, N, A, b, epsilon
     (id = $id:expr, algo = $solver:ident, N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*], epsilon = $epsilon:expr) => {
         test!(id = $id, algo = $solver, N = $N, A = vec![$($a)*], b = vec![$($b)*], epsilon = $epsilon);
     };
@@ -10,7 +30,7 @@ macro_rules! test {
         test!(id = $id, algo = $solver, N = $N, A = [$($a)*], b = [$($b)*], epsilon = $epsilon);
     };
 
-    // Specify A, b, omit epsilon
+    // Specify id, algo, N, A, b, omit epsilon
     (id = $id:expr, algo = $solver:ident, N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*]) => {
         test!(id = $id, algo = $solver, N = $N, A = [$($a)*], b = [$($b)*], epsilon = Num::EPSILON);
     };
@@ -19,7 +39,7 @@ macro_rules! test {
         test!(id = $id, algo = $solver, N = $N, A = [$($a)*], b = [$($b)*]);
     };
 
-    // Specify epsilon, omit A, b
+    // Specify id, algo, N, epsilon, omit A, b
     (id = $id:expr, algo = $solver:ident, N = $N:expr, epsilon = $epsilon:expr) => {
         test!(id = $id, algo = $solver, N = $N, A = crate::utils::__random_vec::<{ $N * $N }>(), b = crate::utils::__random_vec::<$N>(), epsilon = $epsilon);
     };
@@ -28,16 +48,16 @@ macro_rules! test {
         test!(id = $id, algo = $solver, N = $N, epsilon = $epsilon);
     };
 
-    // Omit A, b, epsilon
+    // Specify id, algo, N, omit A, b, epsilon
     (id = $id:expr, algo = $solver:ident, N = $N:expr) => {
-        test!(id = $id, algo = $solver, N = $N, A = crate::utils::__random_vec::<{ $N * $N }>(), b = crate::utils::__random_vec::<$N>(), epsilon = Num::EPSILON);
+        test!(id = $id, algo = $solver, N = $N, A = crate::utils::__random_vec::<{ $N * $N }>(), b = crate::utils::__random_vec::<$N>(), epsilon = crate::utils::__EPISILON);
     };
 
     (id = $id:expr, algo = $solver:ident, N = $N:expr,) => {
         test!(id = $id, algo = $solver, N = $N);
     };
 
-    // Base case
+    // Specify id, algo, N, raw A, raw b, epsilon
     (id = $id:expr, algo = $solver:ident, N = $N:expr, A = $A:expr, b = $b:expr, epsilon = $epsilon:expr) => {
         paste::paste! {
             #[test]
@@ -77,6 +97,8 @@ macro_rules! test {
 }
 
 pub(crate) use test;
+
+pub const __EPISILON: Num = Num::EPSILON;
 
 pub fn __random_vec<const N: usize>() -> Vec<Num> {
     use rand::Rng;
