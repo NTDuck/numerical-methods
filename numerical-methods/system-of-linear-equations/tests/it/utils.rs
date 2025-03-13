@@ -1,57 +1,138 @@
+use std::ops::Range;
+
 use system_of_linear_equations::Num;
 
 macro_rules! test {
-    // Specify A, b, epsilon
-    (id = $id:expr, algo = $solver:ident, N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*], epsilon = $epsilon:expr) => {
-        test!(id = $id, algo = $solver, N = $N, A = vec![$($a)*], b = vec![$($b)*], epsilon = $epsilon);
+    (
+        id = $id:expr, algo = $solver:ident,
+        N = $N:expr, A = [$($a_num:tt)*], b = [$($b_num:tt)*],
+    ) => {
+        test!(
+            id = $id, algo = $solver,
+            N = $N, A = [$($a_num)*], b = [$($b_num)*],
+            epsilon = crate::utils::__EPSILON,
+        );
     };
 
-    (id = $id:expr, algo = $solver:ident, N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*], epsilon = $epsilon:expr,) => {
-        test!(id = $id, algo = $solver, N = $N, A = [$($a)*], b = [$($b)*], epsilon = $epsilon);
+    (
+        id = $id:expr, algo = $solver:ident,
+        N = $N:expr, A = [$($a_num:tt)*], b = [$($b_num:tt)*],
+        epsilon = $epsilon:expr,
+    ) => {
+        test!(
+            id = $id, algo = $solver,
+            N = $N, A = vec![$($a_num)*], b = vec![$($b_num)*],
+            epsilon = $epsilon,
+        );
     };
 
-    // Specify A, b, omit epsilon
-    (id = $id:expr, algo = $solver:ident, N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*]) => {
-        test!(id = $id, algo = $solver, N = $N, A = [$($a)*], b = [$($b)*], epsilon = Num::EPSILON);
+    (
+        id = $id:expr, algo = $solver:ident,
+        N = $N:expr,
+    ) => {
+        tests!(
+            id = $id, algo = $solver,
+            N = $N, bounds = (crate::utils::__LOWER_BOUND..crate::utils::__UPPER_BOUND),
+            epsilon = crate::utils::__EPSILON,
+        );
     };
 
-    (id = $id:expr, algo = $solver:ident, N = $N:expr, A = [$($a:tt)*], b = [$($b:tt)*],) => {
-        test!(id = $id, algo = $solver, N = $N, A = [$($a)*], b = [$($b)*]);
+    (
+        id = $id:expr, algo = $solver:ident,
+        N = $N:expr,
+        epsilon = $epsilon:expr,
+    ) => {
+        tests!(
+            id = $id, algo = $solver,
+            N = $N, bounds = (crate::utils::__LOWER_BOUND..crate::utils::__UPPER_BOUND),
+            epsilon = $epsilon,
+        );
     };
 
-    // Specify epsilon, omit A, b
-    (id = $id:expr, algo = $solver:ident, N = $N:expr, epsilon = $epsilon:expr) => {
-        test!(id = $id, algo = $solver, N = $N, A = crate::utils::__random_vec::<{ $N * $N }>(), b = crate::utils::__random_vec::<$N>(), epsilon = $epsilon);
+    (
+        id = $id:expr, algo = $solver:ident,
+        N = $N:expr, bounds = ($lower_bound:tt..$upper_bound:tt),
+    ) => {
+        test!(
+            id = $id, algo = $solver,
+            N = $N, bounds = ($lower_bound..$upper_bound),
+            epsilon = crate::utils::__EPSILON,
+        );
     };
 
-    (id = $id:expr, algo = $solver:ident, N = $N:expr, epsilon = $epsilon:expr,) => {
-        test!(id = $id, algo = $solver, N = $N, epsilon = $epsilon);
+    (
+        id = $id:expr, algo = $solver:ident,
+        N = $N:expr, bounds = ($lower_bound:tt..$upper_bound:tt),
+        epsilon = $epsilon:expr,
+    ) => {{
+        let a_vec = crate::utils::__random_vec::<{ $N * $N }>($lower_bound..$upper_bound);
+        let b_vec = crate::utils::__random_vec::<$N>($lower_bound..$upper_bound);
+
+        test!(
+            id = $id, algo = $solver,
+            N = $N, A = a_vec, b = b_vec,
+            epsilon = $epsilon,
+        );
+    }};
+
+    (
+        id = $id:expr, algo = $solver:ident,
+        N = $N:expr, A = $a_vec:expr, b = $b_vec:expr,
+        epsilon = $epsilon:expr,
+    ) => {
+        test!(
+            id = $id, algo = $solver,
+            N = $N, A = $a_vec, b = $b_vec, x = {
+                let a = DMatrix::<Num>::from_row_iterator($N, $N, $a_vec);
+                let b = DVector::<Num>::from_vec($b_vec);
+                a.svd(true, true).solve(&b, $epsilon).ok()
+            },
+            epsilon = $epsilon,
+        );
     };
 
-    // Omit A, b, epsilon
-    (id = $id:expr, algo = $solver:ident, N = $N:expr) => {
-        test!(id = $id, algo = $solver, N = $N, A = crate::utils::__random_vec::<{ $N * $N }>(), b = crate::utils::__random_vec::<$N>(), epsilon = Num::EPSILON);
+    (
+        id = $id:expr, algo = $solver:ident,
+        N = $N:expr, A = [$($a_num:tt)*], b = [$($b_num:tt)*], x = [$($x_num:tt)*],
+    ) => {
+        test!(
+            id = $id, algo = $solver,
+            N = $N, A = [$($a_num)*], b = [$($b_num)*], x = [$($x_num)*],
+            epsilon = crate::utils::__EPSILON,
+        );
     };
 
-    (id = $id:expr, algo = $solver:ident, N = $N:expr,) => {
-        test!(id = $id, algo = $solver, N = $N);
+    (
+        id = $id:expr, algo = $solver:ident,
+        N = $N:expr, A = [$($a_num:tt)*], b = [$($b_num:tt)*], x = [$($x_num:tt)*],
+        epsilon = $epsilon:expr,
+    ) => {
+        test!(
+            id = $id, algo = $solver,
+            N = $N, A = vec![$($a_num)*], b = vec![$($b_num)*], x =
+                Some(DVector::<Num>::from_vec(vec![$($x_num)*])),
+            epsilon = $epsilon,
+        );
     };
 
-    // Base case
-    (id = $id:expr, algo = $solver:ident, N = $N:expr, A = $A:expr, b = $b:expr, epsilon = $epsilon:expr) => {
+    (
+        id = $id:expr, algo = $solver:ident,
+        N = $N:expr, A = $a_vec:expr, b = $b_vec:expr, x = $x:expr,
+        epsilon = $epsilon:expr,
+    ) => {
         paste::paste! {
             #[test]
-            fn [<test_$id _$solver _$N x$N>]() {
+            fn [<test_$id _$solver:snake _$N x$N>]() {
                 use approx::relative_eq;
                 use nalgebra::{DMatrix, DVector};
                 use system_of_linear_equations::Num;
 
-                let a = DMatrix::<Num>::from_vec($N, $N, $A);
-                let b = DVector::<Num>::from_vec($b);
+                let a = DMatrix::<Num>::from_row_iterator($N, $N, $a_vec);
+                let b = DVector::<Num>::from_vec($b_vec);
 
                 let actual_x = $solver(&a, &b);
-                let expected_x = a.lu().solve(&b);
-            
+                let expected_x = $x;
+
                 match (actual_x, expected_x) {
                     (None, None) => {},
                     (Some(actual_x), Some(expected_x)) => {
@@ -63,11 +144,11 @@ macro_rules! test {
                         }
                     },
                     (None, Some(expected_x)) => panic!(
-                        "Expected a unique solution, found no solution.\nExpected: {:?}",
+                        "Expected a unique solution, found infinite or no solutions.\nExpected: {:?}",
                         expected_x,
                     ),
                     (Some(actual_x), None) => panic!(
-                        "Expected no solution, found a unique solution.\nFound: {:?}",
+                        "Expected infinite or no solutions, found a unique solution.\nFound: {:?}",
                         actual_x,
                     ),
                 }
@@ -78,15 +159,16 @@ macro_rules! test {
 
 pub(crate) use test;
 
-pub fn __random_vec<const N: usize>() -> Vec<Num> {
-    use rand::Rng;
+pub const __EPSILON: Num = Num::EPSILON;
+pub const __LOWER_BOUND: Num = -1e100;
+pub const __UPPER_BOUND: Num = 1e100;
 
-    const LOWER_BOUND: Num = -10.0;
-    const UPPER_BOUND: Num = 10.0;
+pub fn __random_vec<const N: usize>(bounds: Range<Num>) -> Vec<Num> {
+    use rand::Rng;
 
     let mut rng = rand::rng();
 
     (0..N)
-        .map(|_| rng.random_range(LOWER_BOUND..UPPER_BOUND))
+        .map(|_| rng.random_range(bounds.clone()))
         .collect()
 }

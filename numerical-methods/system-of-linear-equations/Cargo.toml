@@ -8,7 +8,12 @@ nalgebra = "0.33"
 
 [dev-dependencies]
 approx = "0.5"
+criterion = { version = "0.5", features = ["html_reports"] }
 colored = "3.0"
 paste = "1.0"
 tabled = "0.18"
 rand = "0.9"
+
+[[bench]]
+name = "system-of-linear-equations"
+harness = false
