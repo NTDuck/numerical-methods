@@ -2,5 +2,10 @@
 
 ## Testing
 ```cmd
-cargo test -p system-of-equations
+cargo test -p system-of-linear-equations
+```
+
+## Benchmarking
+```cmd
+cargo bench
 ```
