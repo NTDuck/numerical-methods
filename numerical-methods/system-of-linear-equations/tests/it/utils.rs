@@ -144,11 +144,11 @@ macro_rules! test {
                         }
                     },
                     (None, Some(expected_x)) => panic!(
-                        "Expected a unique solution, found no solution.\nExpected: {:?}",
+                        "Expected a unique solution, found infinite or no solutions.\nExpected: {:?}",
                         expected_x,
                     ),
                     (Some(actual_x), None) => panic!(
-                        "Expected no solution, found a unique solution.\nFound: {:?}",
+                        "Expected infinite or no solutions, found a unique solution.\nFound: {:?}",
                         actual_x,
                     ),
                 }
