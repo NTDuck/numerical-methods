@@ -83,7 +83,7 @@ macro_rules! test {
         test!(
             id = $id, algo = $solver,
             N = $N, A = $a_vec, b = $b_vec, x = {
-                let a = DMatrix::<Num>::from_vec($N, $N, $a_vec).transpose();
+                let a = DMatrix::<Num>::from_row_iterator($N, $N, $a_vec);
                 let b = DVector::<Num>::from_vec($b_vec);
                 a.svd(true, true).solve(&b, $epsilon).ok()
             },
@@ -127,12 +127,12 @@ macro_rules! test {
                 use nalgebra::{DMatrix, DVector};
                 use system_of_linear_equations::Num;
 
-                let a = DMatrix::<Num>::from_vec($N, $N, $a_vec).transpose();
+                let a = DMatrix::<Num>::from_row_iterator($N, $N, $a_vec);
                 let b = DVector::<Num>::from_vec($b_vec);
 
                 let actual_x = $solver(&a, &b);
                 let expected_x = $x;
-            
+
                 match (actual_x, expected_x) {
                     (None, None) => {},
                     (Some(actual_x), Some(expected_x)) => {
